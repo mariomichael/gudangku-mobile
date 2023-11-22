@@ -1,3 +1,112 @@
+TUGAS 9
+
+# Apakah bisa kita melakukan pengambilan data JSON tanpa membuat model terlebih dahulu? Jika iya, apakah hal tersebut lebih baik daripada membuat model sebelum melakukan pengambilan data JSON?
+Ya, kita bisa melakukan pengambilan data JSON tanpa membuat model terlebih dahulu. Hal ini sering disebut sebagai “raw” atau “untyped”. Dalam Django, ini dilakukan dengan menggunakan modul `requests` atau `http`. Secara keseluruhan, lebih baik membuat model sebelum melakukan pengambilan data JSON. Hal ini memiliki beberapa kelebihan:
+-	Type safety (membantu mencegah kesalahan pada waktu kompilasi)
+-	Code organization (membantu mengorganisir kode dengan baik, memisahkan lapisan data, logika bisnis, dan presentasi)
+-	Validation (memungkinkan untuk menenrikan aturan validasi data yang masuk sehingga aplikasi terlindung dari data yang tidak valid)
+Meskipun banyak kelebihan, melakukan pengambilan data JSON tanpa membuat model terlebih dahulu juga bisa digunakan pada kasus tertentu, misalnya ketika kita hanya ingin menagambil data JSON dan tidak memerlukan model untuk melakukan validasi atau transformasi data.
+
+# Jelaskan fungsi dari CookieRequest dan jelaskan mengapa instance CookieRequest perlu untuk dibagikan ke semua komponen di aplikasi Flutter.
+Fungsi dari CookieRequest adalah untuk mengelola cookies dalam HTTP request. Pengelolaan yang dilakukan CookieRequest ini termasuk pengiriman serta penyimpanan cookie yang diterima dari server. Hal tersebut dilakukan agar session pengguna tetap berjalan dan data-data yang sebelumnya dimasukkan tetap ada.
+Instance CookieRequest perlu untuk dibagikan ke semua komponen di aplikasi Flutter karena beberapa alasan:
+-	Agar cookies bisa bertahan (karena cookies digunakan untuk menyimpan informasi yang perlu dipertahankan seperti status login, membagikan instance CookieRequest akan memastikan cookies tetap tersedia di seluruh aplikasi)
+-	Konsistensi (dengan membagikan instancenya, kita dapat memastikan kalau semua komponen aplikasi menggunakan cookies yang sama, sehingga tercipta konsistensi data dan pengalaman pengguna)
+-	Efisiensi (membagikan instance CookieRequest berarti tidak perlu membuat instance CookieRequest baru untuk setiap komponen sehingga beban aplikasi berkurang dan efisiensinya meningkat)
+
+
+
+# Jelaskan mekanisme pengambilan data dari JSON hingga dapat ditampilkan pada Flutter.
+1.	Membuat permintaan HTTP GET Request ke URL yang diinginkan menggunakan `fetchItem` agar mendapatkan JSON yang berisi list produk
+```
+    var response = await http.get(
+      url,
+      headers: {"Content-Type": "application/json"},
+    );
+```
+2.	Mengubah bentuk respon body dengan melakukan decode agar menjadi bentuk JSON menggunakan `jsonDecode`
+```
+var data = jsonDecode(utf8.decode(response.bodyBytes));
+```
+3.	Mengconvert data JSON menjadi objek Product dan menyimpannya pada list_product
+```
+    List<Welcome> list_product = [];
+    for (var d in data) {
+        if (d != null) {
+            list_product.add(Welcome.fromJson(d));
+        }
+    }
+    return list_product;
+```
+4.	Menampilkan seluruh produk yang ada dengan ListView.builder() untuk membuat daftar produk.
+```
+                    return ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (_, index) => Container(
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                padding: const EdgeInsets.all(20.0),
+                                child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                    Text(
+                                    "${snapshot.data![index].fields.name}",
+                                    style: const TextStyle(
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.bold,
+                                    ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text("${snapshot.data![index].fields.amount}"),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                        "${snapshot.data![index].fields.description}")
+                                ],
+                                ),
+                            ));
+```
+
+# Jelaskan mekanisme autentikasi dari input data akun pada Flutter ke Django hingga selesainya proses autentikasi oleh Django dan tampilnya menu pada Flutter.
+1.	Aplikasi membangun objek request dengan CookieRequest dan meminta input username serta password
+2.	Melakukan login request dengan menggunakan username dan password
+```
+                final response =
+                    await request.login("http://127.0.0.1:8000/auth/login/", {
+                  'username': username,
+                  'password': password,
+                });
+```
+3.	Memberikan respons sesuai login request
+
+# Sebutkan seluruh widget yang kamu pakai pada tugas ini dan jelaskan fungsinya masing-masing.
+-	AlertDialog: menampilkan dialog peringatan ke pengguna
+-	FutureBuilder: membangun widget berdasarkan hasil terbaru Future
+-	ListView.builder: membuat daftar yang bisa discroll secara dinamis
+-	TextButton: menampilkan tombol dengan teks
+-	CookieRequest: mengelola cookies dan autentikasi
+-	LeftDrawer: menampilkan drawer yang ada di sisi kiri layar
+-	Center: menempatkan child widget di Tengah parent
+-	SizedBox: memberikan jarak antarwidget
+-	Provider: melakukan pengelolaan state dan akses data widget
+-	Navigator: menavigasi antarhalaman di aplikasi
+-	LoginPage: menampilkan halaman login
+-	ScaffoldMessanger: menampilkan SnackBar
+
+# Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step! (bukan hanya sekadar mengikuti tutorial).
+•	Memastikan deployment proyek tugas Django kamu telah berjalan dengan baik.
+Saya belum bisa melakukan ini karena deployment masih bermasalah.
+•	 Membuat halaman login pada proyek tugas Flutter.
+Saya melakukan ini dengan menginstall package yang dibutuhkan seperti flutter pub add provider dan flutter pub add pbp_django_auth. Setelah itu saya melakukan modifikasi widget dengan menggunakan Provider terkait dengan CookieRequest. Setelah itu saya membuat berkas login.dart dan mengubah konfigurasi home serta implementasi logout.
+•	 Mengintegrasikan sistem autentikasi Django dengan proyek tugas Flutter.
+Saya melakukan ini dengan membuat aplikasi Django bernama authentication dan mengisi setiap filenya dengan code yang dibutuhkan. Saya juga menginstall modul yang diperlukan seperti Django-cors-headers. Saya menambah konfigurasi setting dan di views.
+•	 Membuat model kustom sesuai dengan proyek aplikasi Django.
+Saya melakukan ini dengan membuka proyek Django, cari JSONnya lalu mengcopy ke website tertentu yang datanya akan digunakan untuk file di aplikasi form.
+•	 Membuat halaman yang berisi daftar semua item yang terdapat pada endpoint JSON di Django yang telah kamu deploy.
+o	 Tampilkan name, amount, dan description dari masing-masing item pada halaman ini.
+Saya melakukan ini dengan melengkapi file yang dibutuhkan
+
+
 TUGAS 2
 
 # Jelaskan perbedaan antara Navigator.push() dan Navigator.pushReplacement(), disertai dengan contoh mengenai penggunaan kedua metode tersebut yang tepat!
